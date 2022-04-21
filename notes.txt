@@ -1,0 +1,4 @@
+npm install ws
+
+https://www.npmjs.com/package/ws#simple-server
+

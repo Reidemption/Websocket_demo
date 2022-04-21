@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title>Agree on the Image</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="center">
+        <h1>Agree on the Image!</h1>
+        <p>
+          <b>
+            Play with a friend. Once you both describe the image with the same
+            word you'll receive a new image.
+          </b>
+        </p>
+        <div>
+          Enter your guess here!
+          <input
+            type="text"
+            @keyup.enter.prevent="imageGuess()"
+            v-model="guess"
+          />
+          <p>{{win_message}}</p>
+        </div>
+        <div v-if="!image">
+          <p>Waiting for other player</p>
+        </div>
+        <img v-if="image" :src="image" />
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
