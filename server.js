@@ -1,6 +1,9 @@
+// import fetch from "node-fetch";
+const fetch = require("node-fetch");
 const express = require("express");
 const cors = require("cors");
 const WebSocket = require("ws");
+//const { response } = require("express");
 const app = express();
 
 app.use(express.static("public"));
@@ -18,9 +21,21 @@ let player1 = null;
 let player2 = null;
 let player1_guesses = [];
 let player2_guesses = [];
+//let image = null;
+let image = async function () {
+  let response = await fetch(
+    `https://api.unsplash.com/photos/random/?client_id=FtkPOyktCA5Vkkd_zFsTnJGTUmsDXiL0dceFqtFDWjU`
+  ); /* .then(function (response) {
+    response.json().then(function (data) {
+      return data.urls.small;
+    });
+  }); */
+  let data = await response.json();
+  return data.urls.small;
+};
 
 const wss = new WebSocket.Server({ server });
-wss.on("connection", function connection(ws) {
+wss.on("connection", async function connection(ws) {
   if (player1 == null) {
     player1 = ws;
     console.log("Player 1 connected");
@@ -29,6 +44,7 @@ wss.on("connection", function connection(ws) {
       player1_guesses = [];
       player2_guesses = [];
       console.log("Player 1 disconnected");
+
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({ type: "player_cap_available" }));
@@ -68,7 +84,13 @@ wss.on("connection", function connection(ws) {
   } else if (player2 == null) {
     player2 = ws;
     console.log("Player 2 connected");
-
+    let x = await image();
+    console.log(x);
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: "player_cap_reached", image: x }));
+      }
+    });
     player2.on("close", function close() {
       player2 = null;
       player1_guesses = [];
@@ -80,7 +102,7 @@ wss.on("connection", function connection(ws) {
       //   }
       // });
     });
-    player2.on("message", function incoming(message) {
+    player2.on("message", async function incoming(message) {
       const data = JSON.parse(message);
       if (data.type === "guess") {
         let returnValue;
@@ -92,9 +114,11 @@ wss.on("connection", function connection(ws) {
               "\n Player1 Guesses: " +
               player1_guesses
           );
+          let newImage = await image();
           returnValue = {
             type: "win",
             message: "You and your partner guessed the same! You win!",
+            image: newImage,
           };
           player1_guesses = [];
           player2_guesses = [];
