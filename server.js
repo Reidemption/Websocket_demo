@@ -52,7 +52,7 @@ wss.on("connection", async function connection(ws) {
       });
     });
 
-    player1.on("message", function incoming(message) {
+    player1.on("message", async function incoming(message) {
       const data = JSON.parse(message);
       if (data.type === "guess") {
         let returnValue;
@@ -64,9 +64,11 @@ wss.on("connection", async function connection(ws) {
               "\n Player2 Guesses: " +
               player2_guesses
           );
+          let newImage = await image();
           returnValue = {
             type: "win",
             message: "You and your partner guessed the same! You win!",
+            image: newImage,
           };
           player1_guesses = [];
           player2_guesses = [];
